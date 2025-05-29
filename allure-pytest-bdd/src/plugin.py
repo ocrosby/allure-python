@@ -74,7 +74,7 @@ def register_marks(config):
 def pytest_configure(config):
     register_marks(config)
 
-    report_dir = config.option.allure_report_dir
+    report_dir = config.option.alluredir
     clean = False if config.option.collectonly else config.option.clean_alluredir
 
     if report_dir:
