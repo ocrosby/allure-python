@@ -389,7 +389,15 @@ def safe_addoption(parser, group, *args, **kwargs):
     opt_name = args[0]
     if getattr(parser, "_option_string_actions", None) and opt_name in parser._option_string_actions:
         return
-    group.addoption(*args, **kwargs)
+
+    try:
+        group.addoption(*args, **kwargs)
+    except ValueError as e:
+        if "already added" in str(e):
+            # Option already exists, skip adding it
+            return
+        else:
+            raise e
 
 def safe_bulk_addoptions(parser, group_name, options):
     group = parser.getgroup(group_name)
