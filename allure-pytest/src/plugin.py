@@ -22,6 +22,7 @@ def pytest_addoption(parser):
             "name": "--alluredir",
             "action": "store",
             "default": None,
+            "dest": "allure_report_dir",
             "help": "Generate Allure report in the specified directory (may not exist)",
         },
         {
@@ -168,7 +169,7 @@ def pytest_addhooks(pluginmanager):
 
 
 def pytest_configure(config):
-    report_dir = config.option.alluredir
+    report_dir = config.option.allure_report_dir
     clean = False if config.option.collectonly else config.option.clean_alluredir
 
     test_helper = AllureTestHelper(config)
