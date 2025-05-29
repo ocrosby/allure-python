@@ -27,21 +27,24 @@ def pytest_addoption(parser):
                         default=None,
                         help="Generate Allure report in the specified directory (may not exist)")
 
-    parser.getgroup("reporting").addoption('--clean-alluredir',
-                                           action="store_true",
-                                           dest="clean_alluredir",
-                                           help="Clean alluredir folder if it exists")
+    if '--clean-alluredir' not in parser._option_string_actions:
+        group.addoption('--clean-alluredir',
+                        action="store_true",
+                        dest="clean_alluredir",
+                        help="Clean alluredir folder if it exists")
 
-    parser.getgroup("reporting").addoption('--allure-no-capture',
-                                           action="store_false",
-                                           dest="attach_capture",
-                                           help="Do not attach pytest captured logging/stdout/stderr to report")
-
-    parser.getgroup("reporting").addoption('--inversion',
-                                           action="store",
-                                           dest="inversion",
-                                           default=False,
-                                           help="Run tests not in testplan")
+    if '--allure-no-capture' not in parser._option_string_actions:
+        group.addoption('--allure-no-capture',
+                        action="store_false",
+                        dest="attach_capture",
+                        help="Do not attach pytest captured logging/stdout/stderr to report")
+    
+    if '--inversion' not in parser._option_string_actions:
+        group.addoption('--inversion',
+                        action="store",
+                        dest="inversion",
+                        default=False,
+                        help="Run tests not in testplan")
 
     def label_type(type_name, legal_values=set()):
         def a_label_type(string):
