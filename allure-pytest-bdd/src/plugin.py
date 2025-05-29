@@ -4,7 +4,7 @@ import os
 import allure_commons
 from allure_commons.logger import AllureFileLogger
 from allure_commons.lifecycle import AllureLifecycle
-from allure_commons.utils import safe_bulk_addoptions
+from allure_commons.utils import safe_addoption, safe_bulk_addoptions
 
 from .allure_api_listener import AllurePytestBddApiHooks
 from .pytest_bdd_listener import PytestBDDListener
@@ -42,7 +42,9 @@ def pytest_addoption(parser):
             raise argparse.ArgumentTypeError("A link pattern is mandatory")
         return pattern
 
-    parser.getgroup("general").addoption(
+    safe_addoption(
+        parser,
+        parser.getgroup("general"),
         "--allure-link-pattern",
         action="append",
         dest="allure_link_pattern",
@@ -50,7 +52,7 @@ def pytest_addoption(parser):
         default=[],
         type=link_pattern,
         help="""A URL pattern for a link type. Allows short links in tests,
-        e.g., 'issue-1'. `pattern.format(short_url)` will be called to get
+        e.g., 'issue-1'. `pattern.format(short_url)` will be called to getgroup
         the full URL"""
     )
 
