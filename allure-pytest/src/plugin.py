@@ -61,65 +61,12 @@ def pytest_addoption(parser):
 
     severities = [x.value for x in list(allure.severity_level)]
     formatted_severities = ', '.join(severities)
-    parser.getgroup("general").addoption('--allure-severities',
-                                         action="store",
-                                         dest="allure_severities",
-                                         metavar="SEVERITIES_SET",
-                                         default={},
-                                         type=label_type(LabelType.SEVERITY, legal_values=set(severities)),
-                                         help=f"""Comma-separated list of severity names.
-                                         Tests only with these severities will be run.
-                                         Possible values are: {formatted_severities}.""")
-
-    parser.getgroup("general").addoption('--allure-epics',
-                                         action="store",
-                                         dest="allure_epics",
-                                         metavar="EPICS_SET",
-                                         default={},
-                                         type=label_type(LabelType.EPIC),
-                                         help="""Comma-separated list of epic names.
-                                         Run tests that have at least one of the specified feature labels.""")
-
-    parser.getgroup("general").addoption('--allure-features',
-                                         action="store",
-                                         dest="allure_features",
-                                         metavar="FEATURES_SET",
-                                         default={},
-                                         type=label_type(LabelType.FEATURE),
-                                         help="""Comma-separated list of feature names.
-                                         Run tests that have at least one of the specified feature labels.""")
-
-    parser.getgroup("general").addoption('--allure-stories',
-                                         action="store",
-                                         dest="allure_stories",
-                                         metavar="STORIES_SET",
-                                         default={},
-                                         type=label_type(LabelType.STORY),
-                                         help="""Comma-separated list of story names.
-                                         Run tests that have at least one of the specified story labels.""")
-
-    parser.getgroup("general").addoption('--allure-ids',
-                                         action="store",
-                                         dest="allure_ids",
-                                         metavar="IDS_SET",
-                                         default={},
-                                         type=label_type(LabelType.ID),
-                                         help="""Comma-separated list of IDs.
-                                         Run tests that have at least one of the specified id labels.""")
 
     def cf_type(string):
         type_name, values = string.split("=", 1)
         atoms = set(values.split(","))
         return [(type_name, atom) for atom in atoms]
 
-    parser.getgroup("general").addoption('--allure-label',
-                                         action="append",
-                                         dest="allure_labels",
-                                         metavar="LABELS_SET",
-                                         default=[],
-                                         type=cf_type,
-                                         help="""List of labels to run in format label_name=value1,value2.
-                                         "Run tests that have at least one of the specified labels.""")
 
     def link_pattern(string):
         pattern = string.split(':', 1)
@@ -130,15 +77,81 @@ def pytest_addoption(parser):
             raise argparse.ArgumentTypeError('Link pattern is mandatory')
         return pattern
 
-    parser.getgroup("general").addoption('--allure-link-pattern',
-                                         action="append",
-                                         dest="allure_link_pattern",
-                                         metavar="LINK_TYPE:LINK_PATTERN",
-                                         default=[],
-                                         type=link_pattern,
-                                         help="""Url pattern for link type. Allows short links in test,
-                                         like 'issue-1'. Text will be formatted to full url with python
-                                         str.format().""")
+
+    safe_bulk_addoptions(parser, "general", [
+        {
+            "name": "--allure-severities",
+            "action": "store",
+            "dest": "allure_severities",
+            "metavar": "SEVERITIES_SET",
+            "default": {},
+            "type": label_type(LabelType.SEVERITY, legal_values=set(severities)),
+            "help": f"""Comma-separated list of severity names.
+                    Tests only with these severities will be run.
+                    Possible values are: {formatted_severities}.""",
+        },
+        {
+            "name": "--allure-epics",
+            "action": "store",
+            "dest": "allure_epics",
+            "metavar": "EPICS_SET",
+            "default": {},
+            "type": label_type(LabelType.EPIC),
+            "help": """Comma-separated list of epic names.
+                    Run tests that have at least one of the specified feature labels.""",
+        },
+        {
+            "name": "--allure-features",
+            "action": "store",
+            "dest": "allure_features",
+            "metavar": "FEATURES_SET",
+            "default": {},
+            "type": label_type(LabelType.FEATURE),
+            "help": """Comma-separated list of feature names.
+                    Run tests that have at least one of the specified feature labels.""",
+        },
+        {
+            "name": "--allure-stories",
+            "action": "store",
+            "dest": "allure_stories",
+            "metavar": "STORIES_SET",
+            "default": {},
+            "type": label_type(LabelType.STORY),
+            "help": """Comma-separated list of story names.
+                    Run tests that have at least one of the specified story labels.""",
+        },
+        {
+            "name": "--allure-ids",
+            "action": "store",
+            "dest": "allure_ids",
+            "metavar": "IDS_SET",
+            "default": {},
+            "type": label_type(LabelType.ID),
+            "help": """Comma-separated list of IDs.
+                    Run tests that have at least one of the specified id labels.""",
+        },
+        {
+            "name": "--allure-label",
+            "action": "append",
+            "dest": "allure_labels",
+            "metavar": "LABELS_SET",
+            "default": [],
+            "type": cf_type,
+            "help": """List of labels to run in format label_name=value1,value2.
+                    Run tests that have at least one of the specified labels.""",
+        },
+        {
+            "name": "--allure-link-pattern",
+            "action": "append",
+            "dest": "allure_link_pattern",
+            "metavar": "LINK_TYPE:LINK_PATTERN",
+            "default": [],
+            "type": link_pattern,
+            "help": """Url pattern for link type. Allows short links in test,
+                    like 'issue-1'. Text will be formatted to full url with python
+                    str.format().""",
+        },
+    ])
 
 
 def cleanup_factory(plugin):
