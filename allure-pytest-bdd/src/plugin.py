@@ -4,6 +4,7 @@ import os
 import allure_commons
 from allure_commons.logger import AllureFileLogger
 from allure_commons.lifecycle import AllureLifecycle
+from allure_commons.utils import safe_bulk_addoptions
 
 from .allure_api_listener import AllurePytestBddApiHooks
 from .pytest_bdd_listener import PytestBDDListener
@@ -15,21 +16,22 @@ from .utils import ALLURE_LINK_MARK
 
 
 def pytest_addoption(parser):
-    group = parser.getgroup("reporting")
-    # Only register --alluredir if it hasn't already been registered
-    if '--alluredir' not in parser._option_string_actions:
-        group.addoption('--alluredir',
-                        action="store",
-                        dest="allure_report_dir",
-                        metavar="DIR",
-                        default=None,
-                        help="Generate Allure report in the specified directory (may not exist)")
-
-    if '--clean-alluredir' not in parser._option_string_actions:
-        group.addoption('--clean-alluredir',
-                        action="store_true",
-                        dest="clean_alluredir",
-                        help="Clean alluredir folder if it exists")
+    safe_bulk_addoptions(parser, "reporting", [
+        {
+            "name": "--alluredir",
+            "action": "store",
+            "dest": "allure_report_dir",
+            "metavar": "DIR",
+            "default": None,
+            "help": "Generate Allure report in the specified directory (may not exist)"
+        },
+        {
+            "name": "--clean-alluredir",
+            "action": "store_true",
+            "dest": "clean_alluredir",
+            "help": "Clean alluredir folder if it exists"
+        }
+    ])
 
     def link_pattern(string):
         pattern = string.split(':', 1)

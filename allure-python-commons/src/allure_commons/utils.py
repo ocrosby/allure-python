@@ -383,3 +383,17 @@ class SafeFormatter(string.Formatter):
             return super().get_value(key, args, kwargs)
         except (KeyError, IndexError):
             raise self.SafeKeyOrIndexError()
+
+def safe_addoption(parser, group, *args, **kwargs):
+    """Add CLI option safely, avoiding duplicate registration."""
+    opt_name = args[0]
+    if getattr(parser, "_option_string_actions", None) and opt_name in parser._option_string_actions:
+        return
+    group.addoption(*args, **kwargs)
+
+def safe_bulk_addoptions(parser, group_name, options):
+    group = parser.getgroup(group_name)
+    for opt in options:
+        opt_name = opt.pop("name")
+        safe_addoption(parser, group, opt_name, **opt)
+

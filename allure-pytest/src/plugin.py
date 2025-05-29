@@ -6,7 +6,7 @@ import os
 
 from allure_commons.types import LabelType, Severity
 from allure_commons.logger import AllureFileLogger
-from allure_commons.utils import get_testplan
+from allure_commons.utils import get_testplan, safe_bulk_addoptions
 
 from allure_pytest.utils import allure_label, allure_labels, allure_full_name
 from allure_pytest.helper import AllureTestHelper, AllureTitleHelper
@@ -17,34 +17,33 @@ from allure_pytest.utils import ALLURE_LABEL_MARK, ALLURE_LINK_MARK
 
 
 def pytest_addoption(parser):
-    group = parser.getgroup("reporting")
-    # Only register --alluredir if it hasn't already been registered
-    if '--alluredir' not in parser._option_string_actions:
-        group.addoption('--alluredir',
-                        action="store",
-                        dest="allure_report_dir",
-                        metavar="DIR",
-                        default=None,
-                        help="Generate Allure report in the specified directory (may not exist)")
-
-    if '--clean-alluredir' not in parser._option_string_actions:
-        group.addoption('--clean-alluredir',
-                        action="store_true",
-                        dest="clean_alluredir",
-                        help="Clean alluredir folder if it exists")
-
-    if '--allure-no-capture' not in parser._option_string_actions:
-        group.addoption('--allure-no-capture',
-                        action="store_false",
-                        dest="attach_capture",
-                        help="Do not attach pytest captured logging/stdout/stderr to report")
-    
-    if '--inversion' not in parser._option_string_actions:
-        group.addoption('--inversion',
-                        action="store",
-                        dest="inversion",
-                        default=False,
-                        help="Run tests not in testplan")
+    safe_bulk_addoptions(parser, "reporting", [
+        {
+            "name": "--alluredir",
+            "action": "store",
+            "default": None,
+            "help": "Generate Allure report in the specified directory (may not exist)",
+        },
+        {
+            "name": "--clean-alluredir",
+            "action": "store_true",
+            "dest": "clean_alluredir",
+            "help": "Clean alluredir folder if it exists",
+        },
+        {
+            "name": "--allure-no-capture",
+            "action": "store_false",
+            "dest": "attach_capture",
+            "help": "Do not attach pytest captured logging/stdout/stderr to report",
+        },
+        {
+            "name": "--inversion",
+            "action": "store",
+            "dest": "inversion",
+            "default": False,
+            "help": "Run tests not in testplan",
+        },
+    ])
 
     def label_type(type_name, legal_values=set()):
         def a_label_type(string):
